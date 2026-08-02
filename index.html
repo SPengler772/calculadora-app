@@ -9,7 +9,7 @@
             --bg-gradient: linear-gradient(135deg, #0f172a 0%, #020617 100%);
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --primary-color: #10b981; /* Verde esmeralda premium */
+            --primary-color: #10b981; 
             --primary-hover: #059669;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -43,6 +43,7 @@
             padding: 32px 24px;
             border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: 20px 0; /* Espaço para rolar bem no mobile */
         }
 
         .header {
@@ -147,7 +148,7 @@
             border: 1px solid rgba(16, 185, 129, 0.2);
             border-radius: 16px;
             text-align: center;
-            display: none; /* Escondido até calcular */
+            display: none; 
             animation: slideUp 0.5s ease forwards;
         }
 
@@ -188,7 +189,7 @@
         
         <div class="input-group">
             <label for="aluguel">Aluguel ou Parcela do Carro (R$)</label>
-            <input type="number" id="aluguel" inputmode="decimal" step="0.01" placeholder="Ex: 3000,00">
+            <input type="number" id="aluguel" inputmode="decimal" step="0.01" placeholder="Ex: 3068,65">
         </div>
 
         <div class="input-group">
@@ -211,6 +212,12 @@
             <input type="number" id="consumo" inputmode="decimal" step="0.1" placeholder="Ex: 11,5">
         </div>
 
+        <!-- NOVO CAMPO DE ALIMENTAÇÃO -->
+        <div class="input-group">
+            <label for="alimentacao">Gasto médio diário c/ alimentação (R$)</label>
+            <input type="number" id="alimentacao" inputmode="decimal" step="0.01" placeholder="Ex: 35,00">
+        </div>
+
         <div id="error-msg" class="error-msg">Por favor, preencha todos os campos corretamente.</div>
 
         <button class="btn-calcular" onclick="calcular()">Calcular Agora</button>
@@ -224,30 +231,33 @@
 
     <script>
         function calcular() {
-            // Coletando os valores (substituindo vírgula por ponto para evitar erros de digitação do usuário)
+            // Coletando os valores (substituindo vírgula por ponto)
             const aluguel = parseFloat(document.getElementById('aluguel').value.replace(',', '.')) || 0;
             const dias = parseFloat(document.getElementById('dias').value.replace(',', '.')) || 0;
             const km_dia = parseFloat(document.getElementById('km_dia').value.replace(',', '.')) || 0;
             const combustivel = parseFloat(document.getElementById('combustivel').value.replace(',', '.')) || 0;
             const consumo = parseFloat(document.getElementById('consumo').value.replace(',', '.')) || 0;
+            const alimentacao = parseFloat(document.getElementById('alimentacao').value.replace(',', '.')) || 0;
 
             const errorMsg = document.getElementById('error-msg');
             const resultContainer = document.getElementById('result-container');
 
-            // Validação: checa se todos os campos foram preenchidos e são maiores que zero
-            if (!aluguel || !dias || !km_dia || !combustivel || !consumo) {
+            // Validação agora inclui a alimentação
+            if (!aluguel || !dias || !km_dia || !combustivel || !consumo || !alimentacao) {
                 errorMsg.style.display = 'block';
                 resultContainer.style.display = 'none';
                 return;
             }
 
-            // Esconde o erro se tudo estiver certo
             errorMsg.style.display = 'none';
 
             // Cálculos
             const custoFixoPorKm = aluguel / (dias * km_dia);
             const custoVariavelPorKm = combustivel / consumo;
-            const custoTotal = custoFixoPorKm + custoVariavelPorKm;
+            const custoAlimentacaoPorKm = alimentacao / km_dia; // Transforma a marmita em custo por KM
+            
+            // Soma de tudo
+            const custoTotal = custoFixoPorKm + custoVariavelPorKm + custoAlimentacaoPorKm;
 
             // Formatação do resultado para o padrão brasileiro
             const formatoBRL = custoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -256,7 +266,7 @@
             document.getElementById('resultado').innerText = formatoBRL;
             resultContainer.style.display = 'block';
             
-            // Rola a tela suavemente para baixo para o usuário ver o resultado no mobile
+            // Rola a tela suavemente para baixo
             resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     </script>
