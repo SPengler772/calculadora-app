@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar do Lucro - Motorista</title>
+    <style>
+        :root {
+            --bg-color: #0e0e0e;
+            --card-bg: #1a1a1a;
+            --primary: #00e676; /* Verde estilo Uber */
+            --text: #ffffff;
+            --text-muted: #888888;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 22px;
+            color: var(--primary);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            background-color: #2a2a2a;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: #000;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .result-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .result-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <h2>Radar do Lucro</h2>
+        
+        <div class="form-group">
+            <label>Valor do Aluguel ou Parcela Mensal (R$)</label>
+            <input type="number" id="aluguel" value="3068.65" step="0.01">
+        </div>
+
+        <div class="form-group">
+            <label>Dias trabalhados no mês</label>
+            <input type="number" id="dias" value="26">
+        </div>
+
+        <div class="form-group">
+            <label>KM médio rodado por dia</label>
+            <input type="number" id="km_dia" value="150">
+        </div>
+
+        <div class="form-group">
+            <label>Preço do Combustível (R$)</label>
+            <input type="number" id="combustivel" value="5.60" step="0.01">
+        </div>
+
+        <div class="form-group">
+            <label>Consumo do Carro (KM por Litro)</label>
+            <input type="number" id="consumo" value="11" step="0.1">
+        </div>
+
+        <button onclick="calcular()">CALCULAR CUSTO POR KM</button>
+
+        <div class="result-box">
+            <div class="result-label">Seu custo real é de:</div>
+            <div class="result-value" id="resultado">R$ 0,00</div>
+            <div class="result-label" style="margin-top: 10px; font-size: 12px;">Nunca aceite corridas abaixo deste valor.</div>
+        </div>
+    </div>
+
+    <script>
+        function calcular() {
+            const aluguel = parseFloat(document.getElementById('aluguel').value) || 0;
+            const dias = parseFloat(document.getElementById('dias').value) || 1;
+            const km_dia = parseFloat(document.getElementById('km_dia').value) || 1;
+            const combustivel = parseFloat(document.getElementById('combustivel').value) || 0;
+            const consumo = parseFloat(document.getElementById('consumo').value) || 1;
+
+            const custoFixoPorKm = aluguel / (dias * km_dia);
+            const custoVariavelPorKm = combustivel / consumo;
+            const custoTotal = custoFixoPorKm + custoVariavelPorKm;
+
+            document.getElementById('resultado').innerText = 'R$ ' + custoTotal.toFixed(2).replace('.', ',');
+        }
+    </script>
+</body>
+</html>
