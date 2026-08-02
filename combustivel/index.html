@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Etanol ou Gasolina? - Radar do Lucro</title>
+    <style>
+        /* MANTÉM O MESMO ESTILO PREMIUM */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --primary-color: #3b82f6; /* Azul para diferenciar da outra tela */
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --error: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            width: 100%;
+            max-width: 420px;
+            padding: 32px 24px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            margin: 20px 0;
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px; }
+        .header p { font-size: 14px; color: var(--text-muted); }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
+        .input-group input { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: var(--text-main); padding: 16px; border-radius: 12px; font-size: 16px; transition: all 0.3s ease; }
+        .input-group input:focus { outline: none; border-color: var(--primary-color); background: rgba(0,0,0,0.4); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+
+        .btn-calcular { width: 100%; background: var(--primary-color); color: #fff; border: none; padding: 18px; font-size: 16px; font-weight: 700; border-radius: 12px; cursor: pointer; margin-top: 10px; text-transform: uppercase; transition: all 0.2s ease; }
+        .btn-calcular:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-voltar { width: 100%; background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); padding: 16px; font-size: 14px; border-radius: 12px; cursor: pointer; margin-top: 15px; text-decoration: none; display: block; text-align: center; }
+
+        .result-container { margin-top: 30px; padding: 24px; border-radius: 16px; text-align: center; display: none; animation: slideUp 0.5s ease forwards; }
+        .result-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+        .result-value { font-size: 34px; font-weight: 800; margin: 10px 0; color: #fff; }
+        .result-footer { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+        
+        .winner-etanol { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); }
+        .winner-gasolina { background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.5); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div class="header">
+            <h1>Duelo de Bombas</h1>
+            <p>Descubra qual combustível rende mais hoje</p>
+        </div>
+        
+        <div class="input-group">
+            <label>Valor que você vai abastecer (R$)</label>
+            <input type="number" id="valor_abastecer" inputmode="decimal" step="0.01" placeholder="Ex: 100,00">
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <div class="input-group" style="flex: 1;">
+                <label>Preço Etanol</label>
+                <input type="number" id="preco_etanol" inputmode="decimal" step="0.01" placeholder="Ex: 3,79">
+            </div>
+            <div class="input-group" style="flex: 1;">
+                <label>Consumo Etanol</label>
+                <input type="number" id="consumo_etanol" inputmode="decimal" step="0.1" placeholder="Ex: 8,5">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <div class="input-group" style="flex: 1;">
+                <label>Preço Gasolina</label>
+                <input type="number" id="preco_gasolina" inputmode="decimal" step="0.01" placeholder="Ex: 5,59">
+            </div>
+            <div class="input-group" style="flex: 1;">
+                <label>Consumo Gasolina</label>
+                <input type="number" id="consumo_gasolina" inputmode="decimal" step="0.1" placeholder="Ex: 11,5">
+            </div>
+        </div>
+
+        <button class="btn-calcular" onclick="compararCombustivel()">Comparar Agora</button>
+        
+        <!-- Botão para voltar ao menu principal -->
+        <a href="../" class="btn-voltar">← Voltar para o Custo por KM</a>
+
+        <div id="result-container" class="result-container">
+            <div class="result-title">Abasteça com</div>
+            <div class="result-value" id="resultado-vencedor">CARREGANDO...</div>
+            <div class="result-footer" id="resultado-detalhes">...</div>
+        </div>
+    </div>
+
+    <script>
+        function compararCombustivel() {
+            const valor = parseFloat(document.getElementById('valor_abastecer').value.replace(',', '.')) || 0;
+            const pEt = parseFloat(document.getElementById('preco_etanol').value.replace(',', '.')) || 0;
+            const cEt = parseFloat(document.getElementById('consumo_etanol').value.replace(',', '.')) || 0;
+            const pGa = parseFloat(document.getElementById('preco_gasolina').value.replace(',', '.')) || 0;
+            const cGa = parseFloat(document.getElementById('consumo_gasolina').value.replace(',', '.')) || 0;
+
+            if (!valor || !pEt || !cEt || !pGa || !cGa) {
+                alert("Preencha todos os campos para a mágica acontecer.");
+                return;
+            }
+
+            // Quanto custa 1 km em cada combustível?
+            const custoKmEt = pEt / cEt;
+            const custoKmGa = pGa / cGa;
+
+            // Quantos litros dá pra comprar com o valor?
+            const litrosEt = valor / pEt;
+            const litrosGa = valor / pGa;
+
+            // Quantos KM o carro vai rodar com esse valor?
+            const kmTotalEt = litrosEt * cEt;
+            const kmTotalGa = litrosGa * cGa;
+
+            const resultContainer = document.getElementById('result-container');
+            const vencedorEl = document.getElementById('resultado-vencedor');
+            const detalhesEl = document.getElementById('resultado-detalhes');
+
+            // Limpa as classes de cor
+            resultContainer.classList.remove('winner-etanol', 'winner-gasolina');
+
+            if (custoKmEt < custoKmGa) {
+                // Etanol ganha
+                const difKm = (kmTotalEt - kmTotalGa).toFixed(1);
+                resultContainer.classList.add('winner-etanol');
+                vencedorEl.innerText = 'ETANOL';
+                vencedorEl.style.color = '#10b981'; // Verde
+                detalhesEl.innerHTML = `Com <strong>R$ ${valor.toFixed(2).replace('.',',')}</strong> no Etanol, você roda <strong>${kmTotalEt.toFixed(1)} km</strong>.<br><br>Isso é <strong>${difKm} km a mais</strong> do que se colocasse gasolina.`;
+            } else {
+                // Gasolina ganha
+                const difKm = (kmTotalGa - kmTotalEt).toFixed(1);
+                resultContainer.classList.add('winner-gasolina');
+                vencedorEl.innerText = 'GASOLINA';
+                vencedorEl.style.color = '#f59e0b'; // Laranja/Amarelo
+                detalhesEl.innerHTML = `Com <strong>R$ ${valor.toFixed(2).replace('.',',')}</strong> na Gasolina, você roda <strong>${kmTotalGa.toFixed(1)} km</strong>.<br><br>Isso é <strong>${difKm} km a mais</strong> do que se colocasse etanol.`;
+            }
+
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
